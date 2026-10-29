@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ryan | Discapp</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+        body {
+            background-color: #111214;
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+        .bg-image {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 0;
+            background-image: url('background.png');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.7;
+            filter: blur(1px);
+        }
+        .bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 0;
+            background: radial-gradient(circle at 50% 50%, rgba(17, 18, 20, 0.2) 0%, rgba(17, 18, 20, 0.65) 100%);
+        }
+        .particle {
+            position: absolute;
+            background-color: #acf6c8;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+            animation: floatAndGlow 14s infinite ease-in-out;
+        }
+        .particle:nth-child(1) { width: 3px; height: 3px; left: 15%; top: 80%; animation-duration: 16s; animation-delay: 0s; }
+        .particle:nth-child(2) { width: 2px; height: 2px; left: 35%; top: 90%; animation-duration: 20s; animation-delay: 3s; }
+        .particle:nth-child(3) { width: 4px; height: 4px; left: 65%; top: 85%; animation-duration: 18s; animation-delay: 1s; opacity: 0.15; }
+        .particle:nth-child(4) { width: 2px; height: 2px; left: 85%; top: 75%; animation-duration: 22s; animation-delay: 5s; }
+        @keyframes floatAndGlow {
+            0% { transform: translateY(0) scale(1); opacity: 0; }
+            30% { opacity: 0.25; }
+            70% { opacity: 0.25; }
+            100% { transform: translateY(-80vh) scale(0.8); opacity: 0; }
+        }
+        .card {
+            position: relative;
+            z-index: 1;
+            background-color: #111214;
+            border: 2px solid #1e2025;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 860px;
+            padding: 40px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            box-shadow: 6px 6px 0px #060708;
+        }
+        @media (max-width: 768px) {
+            .card { grid-template-columns: 1fr; }
+        }
+        .profile-section {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .avatar-img {
+            width: 90px;
+            height: 90px;
+            border-radius: 12px;
+            object-fit: cover;
+            border: 2px solid #23262d;
+            box-shadow: 3px 3px 0px #060708;
+            margin-bottom: 24px;
+            background-color: #16181c;
+        }
+        .name {
+            font-size: 2.2rem;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            color: #ffffff;
+        }
+        .badges-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 24px;
+        }
+        .badge-item {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #16181c;
+            border: 2px solid #23262d;
+            border-radius: 6px;
+            padding: 5px;
+            width: 32px;
+            height: 32px;
+            cursor: pointer;
+            box-shadow: 2px 2px 0px #060708;
+            transition: transform 0.1s ease, box-shadow 0.1s ease, border-color 0.1s ease;
+        }
+        .badge-item:hover {
+            transform: translate(-1px, -1px);
+            box-shadow: 3px 3px 0px #060708;
+            border-color: #2e323b;
+        }
+        .badge-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        .badge-item::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: calc(100% + 10px);
+            left: 50%;
+            transform: translateX(-50%) translateY(4px);
+            background-color: #16181c;
+            color: #acf6c8;
+            font-family: monospace;
+            font-size: 0.7rem;
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: 1px solid #23262d;
+            box-shadow: 2px 2px 0px #060708;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.15s ease-in-out;
+            pointer-events: none;
+            z-index: 10;
+        }
+        .badge-item:hover::after {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(0);
+        }
+        .bio {
+            color: #9aa0ac;
+            font-size: 0.875rem;
+            line-height: 1.65;
+            margin-bottom: 32px;
+        }
+        .socials {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .btn-social {
+            background-color: #16181c;
+            color: #d1d5db;
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: 2px solid #23262d;
+            box-shadow: 3px 3px 0px #060708;
+            transition: transform 0.1s ease, box-shadow 0.1s ease, border-color 0.1s ease;
+        }
+        .btn-social:hover {
+            transform: translate(-1px, -1px);
+            box-shadow: 4px 4px 0px #060708;
+            border-color: #2e323b;
+            color: #ffffff;
+        }
+        .details-section {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            gap: 28px;
+        }
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #8b909a;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 14px;
+        }
+        .section-header::after {
+            content: '';
+            flex: 1;
+            height: 2px;
+            background-color: #23262d;
+        }
+        .section-divider {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            margin: 10px 0 35px 0;
+        }
+        .section-divider::after {
+            content: '';
+            flex: 1;
+            height: 2px;
+            background-color: #23262d;
+        }
+        .list-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .list-item {
+            background-color: #16181c;
+            border: 2px solid #23262d;
+            border-radius: 6px;
+            padding: 14px 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #ffffff;
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-decoration: none;
+            box-shadow: 3px 3px 0px #060708;
+            transition: transform 0.1s ease, box-shadow 0.1s ease, border-color 0.1s ease;
+        }
+        .list-item:hover {
+            transform: translate(-1px, -1px);
+            box-shadow: 4px 4px 0px #060708;
+            border-color: #2e323b;
+        }
+        .item-meta {
+            color: #acf6c8;
+            font-family: monospace;
+            font-size: 0.8rem;
+        }
+        .brand-logo-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+        }
+        .brand-logo-link {
+            display: inline-block;
+            text-decoration: none;
+            opacity: 0.88;
+            transition: opacity 0.2s ease, transform 0.15s ease, filter 0.2s ease;
+        }
+        .brand-logo-link:hover {
+            opacity: 1;
+            transform: scale(1.06);
+            filter: drop-shadow(0px 0px 10px rgba(172, 246, 200, 0.25));
+        }
+        .brand-logo-img {
+            max-width: 100%;
+            height: auto;
+            max-height: 95px;
+            object-fit: contain;
+            display: block;
+        }
+        .footer {
+            position: relative;
+            z-index: 1;
+            margin-top: 32px;
+            color: #e2e8f0;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+            font-family: monospace;
+            font-size: 0.75rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-image"></div>
+    <div class="bg-canvas"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="card">
+        <div class="profile-section">
+            <img class="avatar-img" src="avatar.png" alt="Ryan Avatar">
+            <h1 class="name">Ryan</h1>
+            <div class="badges-row">
+                <!-- <div class="badge-item" data-tooltip="Discapp Developer">
+                    <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23acf6c8' stroke-width='2'><path stroke-linecap='round' stroke-linejoin='round' d='M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4'/></svg>" alt="Developer">
+                </div> -->
+                <div class="badge-item" data-tooltip="Discapp Staff">
+                    <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23acf6c8' stroke-width='2'><path stroke-linecap='round' stroke-linejoin='round' d='M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z'/></svg>" alt="Staff">
+                </div>
+                <div class="badge-item" data-tooltip="Discapp Contributor">
+                    <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23acf6c8' stroke-width='2'><circle cx='18' cy='18' r='3'/><circle cx='6' cy='6' r='3'/><path stroke-linecap='round' stroke-linejoin='round' d='M13 6h3a2 2 0 012 2v7M6 9v12'/></svg>" alt="Contributor">
+                </div>
+                <!-- <div class="badge-item" data-tooltip="Discapp Supporter">
+                    <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23acf6c8' stroke-width='2'><path stroke-linecap='round' stroke-linejoin='round' d='M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z'/></svg>" alt="Supporter">
+                </div> -->
+                <div class="badge-item" data-tooltip="Friend">
+                    <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23acf6c8' stroke-width='2'><path stroke-linecap='round' stroke-linejoin='round' d='M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z'/></svg>" alt="Friend">
+                </div>
+            </div>
+            <p class="bio">
+                Hi, I’m Ryan! I don’t really have much to say… except I enjoy Parkour, Hiking, and Food.
+            </p>
+            <!-- <div class="socials">
+                <a href="*" target="_blank" class="btn-social">*</a>
+                <a href="*" target="_blank" class="btn-social">*</a>
+                <a href="*" target='_blank' class="btn-social">*</a>
+            </div> -->
+        </div>
+        <div class="details-section">
+            <div>
+                <div class="section-header">
+                    <span>MY PROJECTS</span>
+                </div>
+                <div class="list-container">
+                    <a href="https://thebananabot.com/" class="list-item">
+                        <span>Ban(ana) - Server Protection Bot</span>
+                        <span class="item-meta">9 / 2026</span>
+                    </a>
+                    <a href="https://www.bump4you.com/" class="list-item">
+                        <span>Bump4You - Server Promotion Bot</span>
+                        <span class="item-meta">5 / 2023</span>
+                    </a>
+                    <!-- <a href="https://discord.com/oauth2/authorize?client_id=1563972276842528779" class="list-item">
+                        <span>Spark | Discord Bot</span>
+                        <span class="item-meta">10 / 2026</span>
+                    </a> -->
+                </div>
+            </div>
+            <div>
+                <div class="section-divider"></div>
+                <div class="brand-logo-container">
+                    <a href="https://discapp.org" class="brand-logo-link">
+                        <img class="brand-logo-img" src="discapp-mini.png" alt="Discapp Logo">
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="footer">
+        &copy; 2026 Discapp. ALL RIGHTS RESERVED.
+    </div>
+</body>
+</html>
